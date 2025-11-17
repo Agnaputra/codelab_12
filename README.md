@@ -958,7 +958,7 @@ Type the code as follows.
 Step 8: Run
 As a result, every second a new number will appear as follows.
 
-
+![alt text](streambuilder_agna/images/lab6/2.png)
 
 - Question 12
 Explain the meaning of the code in steps 3 and 7!
@@ -966,7 +966,7 @@ Capture your practical results in GIF format and attach them to the README.
 Then do a commit with the message " W12: Answer to Question 12 ".
 
 
-
+![alt text](streambuilder_agna/images/lab6/3.gif)
 
 
 
