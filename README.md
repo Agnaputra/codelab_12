@@ -472,8 +472,8 @@ Steps 13 through 15 are designed to demonstrate how a Stream Controller can send
   ![alt text](stream_agna/images/lab2/7.gif)
 
 ## Practical 3: Injecting data into streams
-S
-### tep 1: Openmain.dart
+
+### Step 1: Openmain.dart
 Add new variable insideclass _StreamHomePageState
 ```dart:
   // Step 1 lab 3: Tambahkan variabel transformer
@@ -1214,4 +1214,6 @@ In the provided code, the BLoC concept is implemented as follows:
 
 Consequently, the UI is responsible only for displaying data and sending events, while the RandomNumberBloc is solely responsible for all data manipulation and state management.
 
-![alt text](<Adobe Express - WhatsApp Video 2025-11-17 at 16.14.08.gif>)
+![alt text](bloc_random_agna/images/lab7/6.gif)
+
+![alt text](bloc_random_agna/images/lab7/5.png)
