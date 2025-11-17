@@ -787,37 +787,171 @@ Result: Each time data is sent, setState() is effectively triggered twice (once 
 ### Step 1: Create a New Project
 Create a new flutter project named streambuilder_nama (give it your nickname) in the week-12/src/ folder of your GitHub repository.
 
+![alt text](streambuilder_agna/images/lab6/1.png)
+
 ### Step 2: Create a new filestream.dart
 Type this code
+```dart:
+// stream.dart
+import 'dart:async';
+import 'dart:math';
 
+class NumberStream {}
+```
 
-
-Step 3: Stay in the filestream.dart
+### Step 3: Stay in the filestream.dart
 Type the code as follows.
+```dart:
+  // Step 3: Method yang mengembalikan Stream periodik
+  Stream<int> getNumbers() async* {
+    yield* Stream.periodic(const Duration(seconds: 1), (int t) {
+      Random random = Random();
+      int myNum = random.nextInt(10);
+      return myNum; // Mengembalikan angka acak (0-9)
+    });
+  }
+```
 
 
-
-Step 4: Edit main.dart
+### Step 4: Edit main.dart
 Type the code as follows.
+```dart:
+// main.dart
+import 'package:flutter/material.dart';
+import 'stream.dart';
+import 'dart:async';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Stream',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: const StreamHomePage(),
+    );
+  }
+}
+
+class StreamHomePage extends StatefulWidget {
+  const StreamHomePage({super.key});
+
+  @override
+  State<StreamHomePage> createState() => _StreamHomePageState();
+}
+
+class _StreamHomePageState extends State<StreamHomePage> {
+  // Step 5: Tambahkan variabel Stream
+  late Stream<int> numberStream;
+
+  @override
+  void initState() {
+    // Step 6: Inisialisasi Stream
+    numberStream = NumberStream().getNumbers();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("StreamBuilder Demo"),
+      ),
+      // Step 7: Gunakan StreamBuilder
+      body: StreamBuilder<int>(
+        stream: numberStream,
+        initialData: 0, // Nilai awal sebelum data pertama tiba
+        builder: (context, snapshot) {
+          
+          // 1. Penanganan Error
+          if (snapshot.hasError) {
+            print('Error! ${snapshot.error}');
+            return const Center(child: Text('Error!'));
+          }
+
+          // 2. Penanganan Data
+          if (snapshot.hasData) {
+            return Center(
+              child: Text(
+                snapshot.data.toString(),
+                style: const TextStyle(fontSize: 96),
+              ),
+            );
+          } 
+          
+          // 3. Penanganan Loading (snapshot.hasData false)
+          else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
+  }
+}
+```
 
 
 
-
-
-
-
-Step 5: Add variables
+### Step 5: Add variables
 Inside class _StreamHomePageState, when this variable.
+```dart:
+class _StreamHomePageState extends State<StreamHomePage> {
+  // Step 5: Tambahkan variabel Stream
+  late Stream<int> numberStream;
+}
+```
 
 
-
-Step 6: EditinitState()
+### Step 6: EditinitState()
 Type the code as follows.
+```dart:
+@override
+  void initState() {
+    // Step 6: Inisialisasi Stream
+    numberStream = NumberStream().getNumbers();
+    super.initState();
+  }
+```
 
 
+### Step 7: Edit methodbuild()
+```dart:
+// Step 7: Gunakan StreamBuilder
+      body: StreamBuilder<int>(
+        stream: numberStream,
+        initialData: 0, // Nilai awal sebelum data pertama tiba
+        builder: (context, snapshot) {
+          
+          // 1. Penanganan Error
+          if (snapshot.hasError) {
+            print('Error! ${snapshot.error}');
+            return const Center(child: Text('Error!'));
+          }
 
-Step 7: Edit methodbuild()
-
+          // 2. Penanganan Data
+          if (snapshot.hasData) {
+            return Center(
+              child: Text(
+                snapshot.data.toString(),
+                style: const TextStyle(fontSize: 96),
+              ),
+            );
+          } 
+          
+          // 3. Penanganan Loading (snapshot.hasData false)
+          else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+```
 
 
 
@@ -826,7 +960,7 @@ As a result, every second a new number will appear as follows.
 
 
 
-Question 12
+- Question 12
 Explain the meaning of the code in steps 3 and 7!
 Capture your practical results in GIF format and attach them to the README.
 Then do a commit with the message " W12: Answer to Question 12 ".
