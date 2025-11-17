@@ -1013,57 +1013,205 @@ Purpose: This code is the reactive consumer. Every time numberStream produces a 
 ### Step 1: Create a new project
 Create a new Flutter project named bloc_random_nama (give it your nickname) in the week-12/src/ folder of your GitHub repository. Then, create a new file in the folder libnamedrandom_bloc.dart
 
-Step 2: Fill in the coderandom_bloc.dart
+![alt text](bloc_random_agna/images/lab7/1.png)
+
+### Step 2: Fill in the coderandom_bloc.dart
 Type the following import code.
+```dart
+// random_bloc.dart
+import 'dart:async';
+import 'dart:math';
+```
 
+### Step 3: Createclass RandomNumberBloc()
+```dart:
+// Step 3: Create class RandomNumberBloc()
+class RandomNumberBloc {
+```
 
-
-Step 3: Createclass RandomNumberBloc()
-
-
-Step 4: Create variablesStreamController
+### Step 4: Create variablesStreamController
 Inside class RandomNumberBloc()type the following variables
+```dart:
+  // Step 4: Create variables StreamController
+
+  // StreamController for input events (menerima sinyal untuk generate)
+  // Inputnya void karena kita hanya butuh sinyal, bukan data spesifik.
+  final generateRandomController = StreamController<void>();
+  
+  // StreamController for output (mengeluarkan angka random)
+  final _randomNumberController = StreamController<int>();
+
+  // Input Sink (diekspos ke UI untuk mengirim event)
+  Sink<void> get generateRandom => generateRandomController.sink;
+  
+  // Output Stream (diekspos ke UI untuk mendengarkan perubahan state)
+  Stream<int> get randomNumber => _randomNumberController.stream;
+```
 
 
+### Step 5: Create a constructor
+```dart:
+  // Step 5: Create a constructor
+  RandomNumberBloc() {
+    // Mendengarkan stream input
+    generateRandomController.stream.listen((_) {
+      // Ketika sinyal diterima, generate angka random
+      final random = Random().nextInt(10);
+      
+      // Kirim hasil angka random ke stream output
+      _randomNumberController.sink.add(random);
+    });
+  }
+```
 
-Step 5: Create a constructor
+### Step 6: Create a methoddispose()
+```dart:
+  // Step 6: Create a method dispose()
+  void dispose() {
+    // Menutup kedua controller untuk menghindari memory leak
+    generateRandomController.close();
+    _randomNumberController.close();
+  }
+```
 
+### Step 7: Editmain.dart
+```dart:
+// main.dart
+import 'package:flutter/material.dart';
+import 'random_screen.dart'; // Import RandomScreen
+import 'dart:async';
 
-Step 6: Create a methoddispose()
+void main() {
+  runApp(const MyApp());
+}
 
+// Step 7: Edit main.dart
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-Step 7: Editmain.dart
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const RandomScreen(), // Menggunakan RandomScreen
+    );
+  }
+}
+```
 
-
-Step 8: Create a new filerandom_screen.dart
+### Step 8: Create a new filerandom_screen.dart
 Inside libyour project folder, create this new file.
 
-Step 9: Import materials andrandom_bloc.dart
+![alt text](bloc_random_agna/images/lab7/2.png)
+
+### Step 9: Import materials andrandom_bloc.dart
 Type this code in a new filerandom_screen.dart
+```dart:
+// random_screen.dart
+import 'package:flutter/material.dart';
+// Sesuaikan path import jika nama project berbeda
+import 'random_bloc.dart'; 
+```
 
 
-
-Step 10: Create a StatefulWidget RandomScreen
+### Step 10: Create a StatefulWidget RandomScreen
 Create it in the filerandom_screen.dart
+```dart:
+// Step 10: Create a StatefulWidget RandomScreen
+class RandomScreen extends StatefulWidget {
+  const RandomScreen({super.key})
+```
 
-Step 11: Create variables
+### Step 11: Create variables
 Type this code insideclass _RandomScreenState
+```dart:
+class _RandomScreenState extends State<RandomScreen> {
+  // Step 11: Create variables (instance BLoC)
+  final _bloc = RandomNumberBloc();
+```
 
 
-
-Step 12: Create a methoddispose()
+### Step 12: Create a methoddispose()
 Type this code insideclass _StreamHomePageState
+```dart:
+  // Step 12: Create a method dispose()
+  @override
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
+  }
+```
 
 
-
-Step 13: Edit methodbuild()
+### Step 13: Edit methodbuild()
 Type this code insideclass _StreamHomePageState
-
+```dart:
+  // Step 13: Edit method build()
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Random Number')),
+      body: Center(
+        // StreamBuilder mendengarkan Stream output BLoC
+        child: StreamBuilder<int>(
+          stream: _bloc.randomNumber,
+          initialData: 0,
+          builder: (context, snapshot) {
+            // Membangun ulang UI setiap kali BLoC mengeluarkan data baru
+            return Text(
+              'Random Number: ${snapshot.data}',
+              style: const TextStyle(fontSize: 24),
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        // Tombol mengirim event ke Sink input BLoC
+        onPressed: () => _bloc.generateRandom.add(null),
+        child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+```
 
 
 Run the application, then you will see random numbers between 0 and 9 every time you press the button FloactingActionButton.
 
-Question 13
+![alt text](bloc_random_agna/images/lab7/3.png)
+
+- Question 13
 Explain the purpose of this practicum! Where does the BLoC pattern concept lie?
 Capture your practical results in GIF format and attach them to the README.
 Then do a commit with the message " W12: Answer to Question 13 ".
+
+Explanation of the Practicum's Purpose
+
+The purpose of this practicum is to manually implement the foundational BLoC (Business Logic Component) pattern in Flutter using Streams and StreamControllers.
+
+Specifically, the goals are:
+
+  - To completely separate the Business Logic (generating the random number) from the User Interface (UI).
+
+  - To establish a reactive data flow between the UI and the logic, where the UI sends an Event (button press) and receives the resulting State (the new random number) via a Stream.
+
+Where the BLoC Pattern Concept Lies 
+The core concept of the BLoC Pattern lies in its strict separation and unidirectional data flow:
+
+![alt text](bloc_random_agna/images/lab7/4.png)
+
+In the provided code, the BLoC concept is implemented as follows:
+
+  1. Events (Input): The FloatingActionButton in the UI sends an Event (specifically, a null signal) to the BLoC's input Sink (_bloc.generateRandom.add(null)).
+
+  2. Business Logic (BLoC): Inside the RandomNumberBloc() constructor, the stream listener (generateRandomController.stream.listen((_) { ... })) catches this Event, executes the business logic (Random().nextInt(10)), and generates a new State.
+
+  3. States (Output): The BLoC sends the new State (the random number) to its output Stream (_randomNumberController.sink.add(random)).
+
+  4. UI Rebuild: The StreamBuilder widget in the UI listens to the BLoC's output Stream (_bloc.randomNumber). Every time a new State arrives, the StreamBuilder automatically rebuilds itself to display the updated number.
+
+Consequently, the UI is responsible only for displaying data and sending events, while the RandomNumberBloc is solely responsible for all data manipulation and state management.
+
+![alt text](<Adobe Express - WhatsApp Video 2025-11-17 at 16.14.08.gif>)
